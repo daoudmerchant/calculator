@@ -13,37 +13,27 @@ const multiply = (a, b) => a * b;
 const divide = (a, b) => a / b;
 
 function operate(a, operator, b) {
-
-    // Floating point conversion
-
-    let decimalValue = 0;
-    
-    function convertDecimal(num) {
-        if ((num.match(/[.]/)) && num.length > 2) {
-            const power = num.slice(num.indexOf("."), num.length - 1).length;
-            decimalValue += power;
-            return num * (10 ** power);
-        } else {
-            return num;
+    function round(result) {
+        result = result.toPrecision(8);
+        if (result.match(/[.]/)) {
+            for (let i = result.length;
+                result.charAt(result.length - 1) === "0";
+                i--) {
+                result = result.slice(0, result.length - 1);
+            }
         }
-    }
-
-    a = convertDecimal(a);
-    b = convertDecimal(b);
-
-    function prepareValue(result, decimalValue) {
-        return (result / (10 ** decimalValue)).toString();
+        return result;
     }
 
     switch (operator) {
         case "+" :
-            return prepareValue(add(a, b), decimalValue);
+            return round(add(a, b));
         case "-" :
-            return prepareValue(subtract(a, b), decimalValue);
+            return round(subtract(a, b));
         case "*" :
-            return prepareValue(multiply(a, b), decimalValue);
+            return round(multiply(a, b));
         case "/" :
-            return prepareValue(divide(a, b), decimalValue);
+            return round(divide(a, b));
     }
 }
 
