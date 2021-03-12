@@ -1,10 +1,9 @@
 // Starting declarations
 
 let array = ["0"];
-let memory;
+let memory, isResult;
 const screenText = document.querySelector("#display").textContent;
 const buttons = document.querySelectorAll(".button");
-isResult = false;
 
 // Math functions
 
@@ -17,8 +16,14 @@ function operate(a, operator, b) {
     isResult = true;
 
     function round(result) {
-        if (result > 99999999) {
-            return "error";
+
+        // Error messages
+        if ((result > 99999999) || (result < 0.0000001)) {
+            return "error"
+        } else if ((operator === "/") && (b === "0")) {
+            return "error"
+
+        // Floating point values
         } else if (!Number.isInteger(result)) {
             result = result.toPrecision(8); // 8 digit calculator
             for (let i = result.length;
@@ -27,14 +32,13 @@ function operate(a, operator, b) {
                 result = result.slice(0, result.length - 1);
             }
             return result;
+
+        // Integer values
         } else {
             return result.toString();
         }
     }
 
-    if ((operator === "/") && (b === "0")) {
-        return "error"
-    }
     switch (operator) {
         case "+" :
             return round(add(a, b));
@@ -56,6 +60,7 @@ function clear() {
 }
 
 function calculate(key) {
+    isResult = false;
     if (array[0] === "error") { array = ["0"] };
 
     if ((array.length === 1) &&
@@ -77,7 +82,6 @@ function calculate(key) {
         } else {
             array.push(key);
         }
-        isResult = false;
     } else if (key.match(/[-+*/]/)) {
         if (array[0] === "error") {
             clear();
@@ -87,13 +91,11 @@ function calculate(key) {
             array = [operate(...array)];
             array[1] = key;
         }
-        isResult = false;
     } else if (key === ".") {
         if (array.length !== 2 && !array[array.length-1].match(/[.]/) && !isResult) {
             array[array.length - 1] += key;
         } else if ((isResult) || (array[0] === "error")) {
             array = ["0."];
-            isResult = false;
         }
     } else if (key === "=") {
         if (array.length === 3) {
@@ -137,6 +139,7 @@ function calculate(key) {
     } else if (key === "clear") {
         clear();
     }
+
     console.log(array);
     console.log(isResult);
 }
