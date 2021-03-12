@@ -105,8 +105,14 @@ function calculate(key) {
         if (array[array.length - 1].match(/\d/)) {
             memory = array[array.length - 1];
         }
-    } else if (key === "removeMem") {
+    } else if (key === "clearMem") {
         memory = undefined;
+    } else if (key === "memPlus") {
+        if ((array[array.length - 1].match(/\d/) &&
+            array[array.length - 1] !== "0")) {
+                memory = (memory) ? (add(memory, array[array.length - 1])).toString() :
+                    array[array.length - 1];
+        }
     } else if (key === "recallMem") {
         if ((memory) &&
             (!array[array.length - 1].match(/\d/))) {
