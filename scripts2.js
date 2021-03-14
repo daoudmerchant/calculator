@@ -16,44 +16,22 @@ const divide = (a, b) => a / b;
 function operate(a, operator, b) {
     isResult = true;
 
+    if ((operator === "/") && (b === "0")) {
+        return "error";
+    }
+
     function formatResult(result) {
-        if ((result > 99999999) || (result < 0.0000001) || (result = Infinity)) {
-            return "error";
-        } else if ((result < 0.000001) && (result.toString().length > digits + 1)) {
-            result = result.toFixed(digits - 1);
-        }
         result = result.toString();
 
-        // Floating point values
-        if (result.includes(".") && (result.length > (digits + 1))) {
-            const decimalPlace = digits - result.indexOf(".");
-            result = Number(result).toFixed(decimalPlace).toString();
-            if (result.includes("e")) {
-                return "error"
-            }; // necessary?
-            for (let i = result.length;
-                result.charAt(result.length - 1) === "0";
-                i--) {
-                result = result.slice(0, result.length - 1);
-            }
-            return result;
-
-        // Integer values
-        } else {
-            return result;
+        // Error messages
+        if ((result.length > digits) || (result.includes("e"))) {
+            return "error"
         }
-    } function formatResult(result) {
-        if ((result > 99999999) || (result < 0.0000001)) {
-            return "error";
-        } else if ((result < 0.000001) && (result.toString().length > digits + 1)) {
-            result = result.toFixed(digits - 1);
-        }
-        result = result.toString();
 
         // Floating point values
-        if (result.includes(".") && (result.length > (digits + 1))) {
-            const decimalPlace = digits - result.indexOf(".");
-            result = Number(result).toFixed(decimalPlace).toString();
+        if (result.includes(".") && (result.length > digits)) {
+            const decimalPlace = (digits + 1) - result.indexOf(".");
+            result = Number(result).toPrecision(decimalPlace);
             if (result.includes("e")) {
                 return "error"
             };
