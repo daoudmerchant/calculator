@@ -13,48 +13,62 @@ h1 {
     align-items: center;
     border: 1px solid darkslategrey;
     position: relative;
-}
-
-#numberbuttons div {
-    border-radius: 50%;
-}
-
-#operatorbuttons div {
-    border-radius: 20%;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 #calculator {
-    width: 100%;
-    height: 80vh;
+    width: 450px; /* ? */
     border: 1px solid black;
-    display: grid;
-    grid-template-rows: 3rem 1fr;
-    grid-template-columns: 3fr 1fr;
-    grid-template-areas:
-        "display display"
-        "numbers operators";
-    gap: 10px;
 }
 
 #display {
-    grid-area: display;
+    margin: 1em;
     border: 1px solid green;
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding-right: 1em;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+#symbolIcons {
+    display: flex;
+    border: 1px solid red;
+}
+
+.displaySymbols {
+    margin: 3px;
+}
+
+#displayM {
+    margin-left: auto;
+}
+
+#operands {
+    text-align: right;
+    font-size: 2.5rem;
+}
+
+#buttonContainer {
     margin: 10px;
-}
-
-#numberbuttons {
-    grid-area: numbers;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-left: 10px;
-    margin-bottom: 10px;
+    grid-template-columns: repeat(4, 1fr);
 }
 
-#operatorbuttons {
-    grid-area: operators;
+#b0 {
+    grid-column: 1 / 3;
+}
+
+#del {
+    grid-column: -3 / -1;
+}
+
+#funExtras {
+    display: flex;
+    justify-content: space-between;
+}
+
+#solarPanel {
+    background-color: green;
+    width: 4rem;
 }

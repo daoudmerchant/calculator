@@ -72,22 +72,24 @@ function formatResult(result) {
     // Already concerned I'm overkilling this calculator
 
     // Floating point values
-    if (result.includes(".") && (result.length > (digits + 1))) {
-        const decimalPlace = digits - result.indexOf(".");
-        result = Number(result).toFixed(decimalPlace).toString();
-        if (result.includes("e")) {
-            return "error"
-        }; // necessary?
-        for (let i = result.length;
-            result.charAt(result.length - 1) === "0";
-            i--) {
-            result = result.slice(0, result.length - 1);
+    if (result.includes(".")) {
+        if (result.length > (digits + 1)) {
+            const decimalPlace = digits - result.indexOf(".");
+            result = Number(result).toFixed(decimalPlace).toString();
+            if (result.includes("e")) {
+                return "error"
+            }; // necessary?
+            for (let i = result.length;
+                result.charAt(result.length - 1) === "0";
+                i--) {
+                result = result.slice(0, result.length - 1);
+            }
         }
         return result;
 
         // Integer values
     } else {
-        return result;
+        return `${result}.`;
     }
 }
 
@@ -145,6 +147,11 @@ function calculate(key) {
             }
             isFloatingPoint = true;
             break;
+        case "pi" :
+            if (array.length !== 2) {
+                array[array.length - 1] = "3.1415927";
+            }
+            break;
         case "plusMinus" :
             if ((array.length !== 2) && (array[array.length - 1] !== "0.")) {
                 array[array.length - 1] =
@@ -179,9 +186,13 @@ function calculate(key) {
             memory = undefined;
             break;
         case "memPlus" :
-            if (array.length !== 2) {
-                memory = (memory) ? `${(+memory + +array[array.length - 1]).toString()}.` :
-                    array[array.length - 1];
+            if ((array.length !== 2) && (memory)) {
+                memory = formatResult(+memory + +array[array.length - 1]);
+            }
+            break;
+        case "memMinus" :
+            if ((array.length !== 2) && (memory)) {
+                memory = formatResult(+memory - +array[array.length - 1]);
             }
             break;
         case "recallMem" :
@@ -203,7 +214,7 @@ function calculate(key) {
                     .length - 1) !== ".") { // if floating point decimal
                         array[array.length - 1] = array[array.length - 1]
                             .slice(0, array[array.length - 1].length - 1);
-                } else if (array[array.length - 1].length === 2) {
+                } else if (array[array.length - 1].length === 2) { // 1 digit integer
                     array[array.length - 1] = "0.";
                     isFloatingPoint = false;
                 } else { // integer
@@ -225,7 +236,7 @@ function calculate(key) {
             }
             isFloatingPoint = false;
             break;
-        case "clear" :
+        case "allClear" :
             clear();
     }
 
