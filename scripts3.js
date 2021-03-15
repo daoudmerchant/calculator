@@ -1,7 +1,6 @@
 // Starting declarations
 
-let array = ["0."];
-let isFloatingPoint = false;
+let array = ["0"];
 let memory, isResult;
 const digits = 8;
 const screenText = document.querySelector("#display").textContent;
@@ -24,7 +23,6 @@ function calcPercentage(a, operator, b) {
 
 function operate(a, operator, b) {
     isResult = true;
-    isFloatingPoint = false;
 
     switch (operator) {
         case "+" :
@@ -38,25 +36,16 @@ function operate(a, operator, b) {
     }
 }
 
-// Other functions
-
-function clear() {
-    array = ["0."];
-    isResult = false;
-}
-
 function formatResult(result) {
     result = result.toString();
-
-    // Invalid values
     
     if ((result.indexOf(".") > digits + 1) || // 99999999
-        ((result.indexOf(".") === digits) && result.length > digits + 1) || // 10000000.1
+        ((result.indexOf(".") === digits) && result.length > digits + 1) ||
         (result === "Infinity")) {
             return "error";    
     }
 
-    // Expand negative E notation values (if required) or throw error
+    // Expand negative E notation values (if required)
 
     if (result.includes("e-")) {
         const eValueIndex = result.indexOf("-") + 1;
@@ -64,7 +53,7 @@ function formatResult(result) {
         if (eValue < digits) {
             result = result.toFixed(digits - 1);           
         } else {
-            return "error"; // too small to be displayed
+            return "error";
         }
     }
 
@@ -106,21 +95,16 @@ function calculate(key) {
         case "7" :
         case "8" :
         case "9" :
-            if (isResult) { // replace result value
-                array = [`${key}.`];
+            if (isResult) {
+                array = [key];
                 isResult = false;
-            } else if ((array[array.length - 1] === "0.") &&
-                       (!isFloatingPoint)) {
-                array[array.length - 1] = `${key}.`; // replace 0
-            } else if ((array.length !== 2) &&
-                       (array[array.length - 1].length < digits + 1) &&
-                       (!isFloatingPoint)) {
-                array[array.length - 1] =
-                        `${array[array.length - 1].slice(0, array[array.length - 1].length - 1)}${key}.`; // increase integer
-            } else if ((isFloatingPoint) && (array[array.length - 1].length <= digits)) {
-                array[array.length - 1] += key; // add num after decimal point
+            } else if (array[array.length - 1] === "0") {
+                array[array.length - 1] = key;
+            } else if ((array[array.length - 1].match(/\d/g)) &&
+                       (array[array.length - 1].length < digits)) {
+                array[array.length - 1] += key;
             } else if (array.length === 2) {
-                array.push(`${key}.`); // add 2nd operand
+                array.push(key);
             }
             break;
         case "+":
@@ -134,19 +118,20 @@ function calculate(key) {
                 array[1] = key;
             }
             isResult = false;
-            isFloatingPoint = false;
             break;
         case "." :
-            if (array.length === 2) {
+            if (array.length !== 2 && !array[array.length-1].includes(".") && !isResult) {
+                array[array.length - 1] += key;
+            } else if (array.length === 2) {
                 array.push("0.")
             } else if (isResult) {
                 array = ["0."];
                 isResult = false;
             }
-            isFloatingPoint = true;
             break;
         case "plusMinus" :
-            if ((array.length !== 2) && (array[array.length - 1] !== "0.")) {
+            if ((array.length !== 2) &&
+                ((array[array.length - 1] !== "0") || (array[array.length - 1] !== "0."))) { // correct this
                 array[array.length - 1] =
                     (array[array.length - 1].charAt(0) === "-") ?
                     array[array.length - 1].slice(1) : "-" + array[array.length - 1];
@@ -156,7 +141,7 @@ function calculate(key) {
             isResult = false;
             break;
         case "%" :
-            if ((array.length === 3) && (array[2] !== "0.")) {
+            if ((array.length === 3) && (array[2] !== "0") && (array[2] !== "0.")) { // correct this
                 array[2] = calcPercentage(...array);
             }
             array = [operate(...array)];
@@ -172,7 +157,7 @@ function calculate(key) {
             if (array.length === 3) { // if (array[array.length - 1].match(/\d/))
                 memory = array[2];
             } else {
-                memory = array[0];
+                memory = array[0];;
             }
             break;
         case "clearMem" :
@@ -180,7 +165,7 @@ function calculate(key) {
             break;
         case "memPlus" :
             if (array.length !== 2) {
-                memory = (memory) ? `${(+memory + +array[array.length - 1]).toString()}.` :
+                memory = (memory) ? (+memory + +array[array.length - 1]).toString() :
                     array[array.length - 1];
             }
             break;
@@ -194,45 +179,35 @@ function calculate(key) {
             }
             break;
         case "del" :
-            if (array === ["0."]) {
+            if (array === ["0"]) {
                 break;
-            } else if (array[2] === "0.") {
-                clear();
-            } else if (array.length !== 2) { // is number
-                if (array[array.length - 1].charAt(array[array.length - 1]
-                    .length - 1) !== ".") { // if floating point decimal
-                        array[array.length - 1] = array[array.length - 1]
-                            .slice(0, array[array.length - 1].length - 1);
-                } else if (array[array.length - 1].length === 2) {
-                    array[array.length - 1] = "0.";
-                    isFloatingPoint = false;
-                } else { // integer
-                    array[array.length - 1] = array[array.length - 1]
-                        .slice(0, array[array.length - 1].length - 2) + ".";
-                    isFloatingPoint = false;
+            } else if (array.length !== 2) {
+                if (array[array.length - 1].length > 1) {
+                    array[array.length - 1] =
+                        array[array.length - 1].slice(0, array[array.length - 1].length - 1);
+                } else if ((array[2] == "0") || (array.length == 2)) {
+                    array = ["0"];
+                } else { // 1 digit 1-9
+                    array[array.length - 1] = "0";
                 }
-            } else { // array.length === 2
-                array.pop();
             }
             break;
         case "clearEntry" :
-            if (array[array.length - 1] === ["0."]) {
+            if (array[array.length - 1] === ["0"]) {
                 break;
             } else if (array.length !== 2) {
-                array[array.length - 1] = "0.";
+                array[array.length - 1] = "0";
             } else { // array.length === 2
                 array.pop();
             }
-            isFloatingPoint = false;
             break;
         case "clear" :
-            clear();
+            array = ["0"];
     }
 
 
     console.log(array);
-    console.log("Is result: " + isResult);
-    console.log("Is floating point: " + isFloatingPoint);
+    console.log(isResult);
     console.log(memory);
 }
 
