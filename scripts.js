@@ -13,62 +13,16 @@ const subtract = (a, b) => a - b;
 const multiply = (a, b) => a * b;
 const divide = (a, b) => a / b;
 
+function calcPercentage(a, operator, b) {
+    if ((operator === "*") || (operator === "/")) {
+        return b / 100;
+    } else { // + or -
+        return (a / 100) * b;
+    }
+}
+
 function operate(a, operator, b) {
     isResult = true;
-
-    function formatResult(result) {
-        if ((result > 99999999) || (result < 0.0000001) || (result = Infinity)) {
-            return "error";
-        } else if ((result < 0.000001) && (result.toString().length > digits + 1)) {
-            result = result.toFixed(digits - 1);
-        }
-        result = result.toString();
-
-        // Floating point values
-        if (result.includes(".") && (result.length > (digits + 1))) {
-            const decimalPlace = digits - result.indexOf(".");
-            result = Number(result).toFixed(decimalPlace).toString();
-            if (result.includes("e")) {
-                return "error"
-            }; // necessary?
-            for (let i = result.length;
-                result.charAt(result.length - 1) === "0";
-                i--) {
-                result = result.slice(0, result.length - 1);
-            }
-            return result;
-
-        // Integer values
-        } else {
-            return result;
-        }
-    } function formatResult(result) {
-        if ((result > 99999999) || (result < 0.0000001)) {
-            return "error";
-        } else if ((result < 0.000001) && (result.toString().length > digits + 1)) {
-            result = result.toFixed(digits - 1);
-        }
-        result = result.toString();
-
-        // Floating point values
-        if (result.includes(".") && (result.length > (digits + 1))) {
-            const decimalPlace = digits - result.indexOf(".");
-            result = Number(result).toFixed(decimalPlace).toString();
-            if (result.includes("e")) {
-                return "error"
-            };
-            for (let i = result.length;
-                result.charAt(result.length - 1) === "0";
-                i--) {
-                result = result.slice(0, result.length - 1);
-            }
-            return result;
-
-        // Integer values
-        } else {
-            return result;
-        }
-    }
 
     switch (operator) {
         case "+" :
@@ -82,6 +36,49 @@ function operate(a, operator, b) {
     }
 }
 
+function formatResult(result) {
+    result = result.toString();
+    
+    if ((result.indexOf(".") > digits + 1) || // 99999999
+        ((result.indexOf(".") === digits) && result.length > digits + 1) ||
+        (result === "Infinity")) {
+            return "error";    
+    }
+
+    // Expand negative E notation values (if required)
+
+    if (result.includes("e-")) {
+        const eValueIndex = result.indexOf("-") + 1;
+        const eValue = result.slice(eValueIndex);
+        if (eValue < digits) {
+            result = result.toFixed(digits - 1);           
+        } else {
+            return "error";
+        }
+    }
+
+    // Requires more code for positive E notation values if digits > 22
+    // Already concerned I'm overkilling this calculator
+
+    // Floating point values
+    if (result.includes(".") && (result.length > (digits + 1))) {
+        const decimalPlace = digits - result.indexOf(".");
+        result = Number(result).toFixed(decimalPlace).toString();
+        if (result.includes("e")) {
+            return "error"
+        }; // necessary?
+        for (let i = result.length;
+            result.charAt(result.length - 1) === "0";
+            i--) {
+            result = result.slice(0, result.length - 1);
+        }
+        return result;
+
+        // Integer values
+    } else {
+        return result;
+    }
+}
 
 // Keypress function
 
@@ -104,7 +101,7 @@ function calculate(key) {
             } else if (array[array.length - 1] === "0") {
                 array[array.length - 1] = key;
             } else if ((array[array.length - 1].match(/\d/g)) &&
-                       (array[array.length - 1].length < 8)) {
+                       (array[array.length - 1].length < digits)) {
                 array[array.length - 1] += key;
             } else if (array.length === 2) {
                 array.push(key);
@@ -131,6 +128,23 @@ function calculate(key) {
                 array = ["0."];
                 isResult = false;
             }
+            break;
+        case "plusMinus" :
+            if ((array.length !== 2) &&
+                ((array[array.length - 1] !== "0") || (array[array.length - 1] !== "0."))) { // correct this
+                array[array.length - 1] =
+                    (array[array.length - 1].charAt(0) === "-") ?
+                    array[array.length - 1].slice(1) : "-" + array[array.length - 1];
+                        // make minus invisible
+                        // add visible minus on left side of display
+            }
+            isResult = false;
+            break;
+        case "%" :
+            if ((array.length === 3) && (array[2] !== "0") && (array[2] !== "0.")) { // correct this
+                array[2] = calcPercentage(...array);
+            }
+            array = [operate(...array)];
             break;
         case "=" :
             if (array.length === 3) {
