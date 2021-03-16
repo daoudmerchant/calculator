@@ -1,12 +1,26 @@
-// Starting declarations
+// digits
+
+const digits = 8;
+
+// document selectors
+
+const screenOperands = document.getElementById("operands");
+const buttons = document.querySelectorAll(".button");
+const background = document.getElementById('background');
+
+const displayPlus = document.getElementById("display+");
+const displayMinus = document.getElementById("display-");
+const displayMultiply = document.getElementById("display*");
+const displayDivide = document.getElementById("display/");
+const displayMem = document.getElementById("displayM");
+const displayAns = document.getElementById("displayAns");
+
+// Starting values
 
 let array = ["0."];
 let isFloatingPoint = false;
 let memory, isResult;
-const digits = 8;
-// const screenText = document.querySelector("#display").textContent;
-const buttons = document.querySelectorAll(".button");
-const background = document.getElementById('background');
+screenOperands.textContent = array[0];
 
 // Math functions
 
@@ -99,47 +113,47 @@ function formatResult(result) {
 function calculate(key) {
 
     switch (key) {
-        case "0" :
-        case "1" :
-        case "2" :
-        case "3" :
-        case "4" :
-        case "5" :
-        case "6" :
-        case "7" :
-        case "8" :
-        case "9" :
+        case "b0" :
+        case "b1" :
+        case "b2" :
+        case "b3" :
+        case "b4" :
+        case "b5" :
+        case "b6" :
+        case "b7" :
+        case "b8" :
+        case "b9" :
             if (isResult) { // replace result value
-                array = [`${key}.`];
+                array = [`${key.charAt(1)}.`];
                 isResult = false;
             } else if ((array[array.length - 1] === "0.") &&
                        (!isFloatingPoint)) {
-                array[array.length - 1] = `${key}.`; // replace 0
+                array[array.length - 1] = `${key.charAt(1)}.`; // replace 0
             } else if ((array.length !== 2) &&
                        (array[array.length - 1].length < digits + 1) &&
                        (!isFloatingPoint)) {
                 array[array.length - 1] =
-                        `${array[array.length - 1].slice(0, array[array.length - 1].length - 1)}${key}.`; // increase integer
+                        `${array[array.length - 1].slice(0, array[array.length - 1].length - 1)}${key.charAt(1)}.`; // increase integer
             } else if ((isFloatingPoint) && (array[array.length - 1].length <= digits)) {
-                array[array.length - 1] += key; // add num after decimal point
+                array[array.length - 1] += key.charAt(1); // add num after decimal point
             } else if (array.length === 2) {
-                array.push(`${key}.`); // add 2nd operand
+                array.push(`${key.charAt(1)}.`); // add 2nd operand
             }
             break;
-        case "+":
-        case "-":
-        case "*":
-        case "/":
+        case "b+":
+        case "b-":
+        case "b*":
+        case "b/":
             if ((array.length < 3) || (isResult)) {
-                array[1] = key;
+                array[1] = key.charAt(1);
             } else if (array.length === 3) {
                 array = [operate(...array)];
-                array[1] = key;
+                array[1] = key.charAt(1);
             }
             isResult = false;
             isFloatingPoint = false;
             break;
-        case "." :
+        case "b." :
             if (array.length === 2) {
                 array.push("0.")
             } else if (isResult) {
@@ -163,28 +177,28 @@ function calculate(key) {
             }
             isResult = false;
             break;
-        case "%" :
+        case "b%" :
             if ((array.length === 3) && (array[2] !== "0.")) {
                 array[2] = calcPercentage(...array);
             }
             array = [operate(...array)];
             break;
-        case "=" :
+        case "b=" :
             if (array.length === 3) {
                 array = [operate(...array)];
             } else if (array.length === 2) {
                 array.pop();
             }
             break;
-        case "addMem" :
-            if (array.length === 3) { // if (array[array.length - 1].match(/\d/))
+        case "toggleMem" :
+            if (memory) {
+                memory = undefined;
+            } else if (array.length === 3) { // if (array[array.length - 1].match(/\d/))
                 memory = array[2];
             } else {
                 memory = array[0];
             }
-            break;
-        case "clearMem" :
-            memory = undefined;
+
             break;
         case "memPlus" :
             if ((array.length !== 2) && (memory)) {
@@ -208,7 +222,7 @@ function calculate(key) {
         case "del" :
             if (array === ["0."]) {
                 break;
-            } else if (array[2] === "0.") {
+            } else if ((array[2] === "0.") || (isResult)) {
                 clear();
             } else if (array.length !== 2) { // is number
                 if (array[array.length - 1].charAt(array[array.length - 1]
@@ -248,7 +262,30 @@ function calculate(key) {
     console.log(memory);
 }
 
-// on click - (calculate(buttonValue));
+// click events
+
+buttons.forEach(button => {
+    button.addEventListener("mousedown", e => {
+        console.log(e.target.getAttribute("id"));
+        calculate(e.target.getAttribute("id"));
+        if (array.length === 1) {
+            screenOperands.textContent = array[0];
+        } else if (array.length === 3) {
+            screenOperands.textContent = array[2];
+        }
+        e.target.classList.toggle('raised');
+    })
+    button.addEventListener("click", e => {
+        e.target.classList.toggle('raised');
+    })
+})
+
+// visual scripts
+
+// toggle display symbols
+
+function toggleSymbol(symbol) { 
+}
 
 // background text generator
 
@@ -292,5 +329,4 @@ let text = "";
 for (let i = 1; i <= 40000; i++) {
     text += generateCharacter();
 }
-console.log(text);
 background.textContent = text;
