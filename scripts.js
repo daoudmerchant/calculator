@@ -5,13 +5,16 @@ const digits = 8;
 // document selectors
 
 const screenOperands = document.getElementById("operands");
-const buttons = document.querySelectorAll(".button");
+const buttons = document.querySelectorAll("button");
 const background = document.getElementById('background');
 
 const displayPlus = document.getElementById("display+");
 const displayMinus = document.getElementById("display-");
 const displayMultiply = document.getElementById("display*");
 const displayDivide = document.getElementById("display/");
+
+const displayOperator = document.getElementsByClassName("displayOperator");
+
 const displayMem = document.getElementById("displayM");
 const displayAns = document.getElementById("displayAns");
 
@@ -163,8 +166,10 @@ function calculate(key) {
             isFloatingPoint = true;
             break;
         case "pi" :
-            if (array.length !== 2) {
-                array[array.length - 1] = "3.1415927";
+            if (array.length === 1) {
+                array[0] = "3.1415927";
+            } else {
+                array[2] = "3.1415927";
             }
             break;
         case "plusMinus" :
@@ -178,7 +183,9 @@ function calculate(key) {
             isResult = false;
             break;
         case "b%" :
-            if ((array.length === 3) && (array[2] !== "0.")) {
+            if (array.length === 1) {
+                break;
+            } else if ((array.length === 3) && (array[2] !== "0.")) {
                 array[2] = calcPercentage(...array);
             }
             array = [operate(...array)];
@@ -190,24 +197,19 @@ function calculate(key) {
                 array.pop();
             }
             break;
-        case "toggleMem" :
-            if (memory) {
-                memory = undefined;
-            } else if (array.length === 3) { // if (array[array.length - 1].match(/\d/))
+        case "addMem" :
+            if (array.length === 3) { // if (array[array.length - 1].match(/\d/))
                 memory = array[2];
             } else {
                 memory = array[0];
             }
-
+            break;
+        case "clearMem" :
+            memory = undefined;
             break;
         case "memPlus" :
             if ((array.length !== 2) && (memory)) {
                 memory = formatResult(+memory + +array[array.length - 1]);
-            }
-            break;
-        case "memMinus" :
-            if ((array.length !== 2) && (memory)) {
-                memory = formatResult(+memory - +array[array.length - 1]);
             }
             break;
         case "recallMem" :
@@ -264,28 +266,64 @@ function calculate(key) {
 
 // click events
 
+function clickButton(e) {
+    console.log(e.target.getAttribute("id"));
+    calculate(e.target.getAttribute("id"));
+    if (array.length === 1) {
+        screenOperands.textContent = array[0];
+    } else if (array.length === 3) {
+        screenOperands.textContent = array[2];
+    }
+    e.target.classList.toggle('raised');
+}
+
+function unclickButton(e) {
+    e.target.classList.toggle('raised');
+}
+
 buttons.forEach(button => {
-    button.addEventListener("mousedown", e => {
-        console.log(e.target.getAttribute("id"));
-        calculate(e.target.getAttribute("id"));
-        if (array.length === 1) {
-            screenOperands.textContent = array[0];
-        } else if (array.length === 3) {
-            screenOperands.textContent = array[2];
-        }
-        e.target.classList.toggle('raised');
-    })
-    button.addEventListener("click", e => {
-        e.target.classList.toggle('raised');
-    })
+    button.addEventListener("mousedown", clickButton);
+    button.addEventListener("mouseup", unclickButton);
 })
+
+// keyboard events
+
+// window.addEventListener('keydown', keyDown => {
+//     console.log(keyDown.key);
+//     keyDown.preventDefault();
+//     switch (keyDown.key) {
+//         case "1" :
+//             document.getElementById("b1").mousedown(clickButton); 
+//             break;
+//     }
+// })
+
+// window.addEventListener('keyup', keyUp => {
+//     switch (keyUp.key) {
+//         case "1" :
+//             console.log("1 was pressed.");
+//             document.getElementById("b1").mouseup(unclickButton);
+//             break;
+//     }
+// })
 
 // visual scripts
 
-// toggle display symbols
 
-function toggleSymbol(symbol) { 
-}
+
+// // toggle display symbols
+
+// function toggleSymbol(displaySymbol) {
+//     if (array.length !== 3) {
+//         displayOperator.forEach(symbol => {
+//             symbol.classList.add('off');
+//         })
+//         displaySymbol.classList.remove('off');
+//     }
+// }
+
+
+
 
 // background text generator
 
@@ -326,7 +364,7 @@ function generateCharacter() {
 }
 
 let text = "";
-for (let i = 1; i <= 40000; i++) {
+for (let i = 1; i <= 50000; i++) {
     text += generateCharacter();
 }
 background.textContent = text;
