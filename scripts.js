@@ -4,8 +4,9 @@ let array = ["0."];
 let isFloatingPoint = false;
 let memory, isResult;
 const digits = 8;
-const screenText = document.querySelector("#display").textContent;
+// const screenText = document.querySelector("#display").textContent;
 const buttons = document.querySelectorAll(".button");
+const background = document.getElementById('background');
 
 // Math functions
 
@@ -248,3 +249,48 @@ function calculate(key) {
 }
 
 // on click - (calculate(buttonValue));
+
+// background text generator
+
+const generateNumber = () => Math.floor(Math.random() * 14) + 1;
+
+function generateCharacter() {
+    let char = generateNumber();
+    switch (char) {
+        case 1:
+            return "0";
+        case 2:
+            return "1";
+        case 3:
+            return "2";
+        case 4:
+            return "3";
+        case 5:
+            return "4";
+        case 6:
+            return "5";
+        case 7:
+            return "6";
+        case 8:
+            return "7";
+        case 9:
+            return "8";
+        case 10:
+            return "9";
+        case 11:
+            return "*";
+        case 12:
+            return "/";
+        case 13:
+            return "+";
+        case 14:
+            return "-";
+    }
+}
+
+let text = "";
+for (let i = 1; i <= 40000; i++) {
+    text += generateCharacter();
+}
+console.log(text);
+background.textContent = text;
