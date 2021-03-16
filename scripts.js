@@ -2,30 +2,32 @@
 
 const digits = 8;
 
-// document selectors
+// DOCUMENT SELECTORS
 
 const screenOperands = document.getElementById("operands");
 const buttons = document.querySelectorAll("button");
 const background = document.getElementById('background');
+
+// display symbols
 
 const displayPlus = document.getElementById("display+");
 const displayMinus = document.getElementById("display-");
 const displayMultiply = document.getElementById("display*");
 const displayDivide = document.getElementById("display/");
 
-const displayOperator = document.getElementsByClassName("displayOperator");
+const displayOperators = document.querySelectorAll(".displayOperator");
 
 const displayMem = document.getElementById("displayM");
 const displayAns = document.getElementById("displayAns");
 
-// Starting values
+// STARTING VALUES
 
 let array = ["0."];
 let isFloatingPoint = false;
 let memory, isResult;
 screenOperands.textContent = array[0];
 
-// Math functions
+// MATH FUNCTIONS
 
 const add = (a, b) => +a + +b;
 const subtract = (a, b) => a - b;
@@ -64,15 +66,16 @@ function clear() {
 }
 
 function formatResult(result) {
-    result = result.toString();
 
     // Invalid values
-    
-    if ((result.indexOf(".") > digits + 1) || // 99999999
-        ((result.indexOf(".") === digits) && result.length > digits + 1) || // 10000000.1
-        (result === "Infinity")) {
-            return "error";    
+
+    if ((result > (10 ** digits - 1)) || // > 99999999
+        (result > (10 ** (digits - 1)) && !Number.isInteger(result)) ||
+        (result === Infinity)) {
+        return "error";
     }
+
+    result = result.toString();
 
     // Expand negative E notation values (if required) or throw error
 
@@ -80,16 +83,16 @@ function formatResult(result) {
         const eValueIndex = result.indexOf("-") + 1;
         const eValue = result.slice(eValueIndex);
         if (eValue < digits) {
-            result = result.toFixed(digits - 1);           
+            result = Number(result).toFixed(digits - 1).toString();           
         } else {
             return "error"; // too small to be displayed
         }
     }
 
     // Requires more code for positive E notation values if digits > 22
-    // Already concerned I'm overkilling this calculator
+    // Already concerned I'm weirdly overkilling this calculator
 
-    // Floating point values
+    // floating point values
     if (result.includes(".")) {
         if (result.length > (digits + 1)) {
             const decimalPlace = digits - result.indexOf(".");
@@ -104,14 +107,12 @@ function formatResult(result) {
             }
         }
         return result;
-
-        // Integer values
-    } else {
+    } else { // integer values
         return `${result}.`;
     }
 }
 
-// Keypress function
+// ON KEYPRESS
 
 function calculate(key) {
 
@@ -256,76 +257,235 @@ function calculate(key) {
         case "allClear" :
             clear();
     }
-
-
-    console.log(array);
-    console.log("Is result: " + isResult);
-    console.log("Is floating point: " + isFloatingPoint);
-    console.log(memory);
 }
 
-// click events
+// INPUT EVENT FUNCTIONS
 
-function clickButton(e) {
-    console.log(e.target.getAttribute("id"));
-    calculate(e.target.getAttribute("id"));
+function pressButton(input) {
+    if (input instanceof MouseEvent) {
+        console.log(input.target.getAttribute("id"));
+        calculate(input.target.getAttribute("id"));
+        input.target.classList.toggle('raised');
+    } else if (input instanceof KeyboardEvent) {
+        if (input.key === "Shift") { return };
+        if (input.key === "k") { showHelp() };
+        const keyValue = convertKey(input.key);
+        calculate(keyValue);
+        document.getElementById(`${keyValue}`).classList.toggle('raised');
+    }
     if (array.length === 1) {
         screenOperands.textContent = array[0];
     } else if (array.length === 3) {
         screenOperands.textContent = array[2];
     }
-    e.target.classList.toggle('raised');
+    setDisplaySymbols();
 }
 
-function unclickButton(e) {
-    e.target.classList.toggle('raised');
+function unpressButton(input) {
+    if (input instanceof MouseEvent) {
+        input.target.classList.toggle('raised');
+    } else if (input instanceof KeyboardEvent) {
+        if (input.key === "Shift") { return };
+        if (input.key === "k") { hideHelp() };
+        const keyValue = convertKey(input.key);
+        document.getElementById(`${keyValue}`).classList.toggle('raised');
+    }
 }
+
+// EVENT LISTENERS
+
+// mouse events
 
 buttons.forEach(button => {
-    button.addEventListener("mousedown", clickButton);
-    button.addEventListener("mouseup", unclickButton);
+    button.addEventListener("mousedown", pressButton);
+    button.addEventListener("mouseup", unpressButton);
 })
 
 // keyboard events
 
-// window.addEventListener('keydown', keyDown => {
-//     console.log(keyDown.key);
-//     keyDown.preventDefault();
-//     switch (keyDown.key) {
-//         case "1" :
-//             document.getElementById("b1").mousedown(clickButton); 
-//             break;
-//     }
-// })
+window.addEventListener('keydown', key => pressButton(key));
+window.addEventListener('keyup', key => unpressButton(key));
 
-// window.addEventListener('keyup', keyUp => {
-//     switch (keyUp.key) {
-//         case "1" :
-//             console.log("1 was pressed.");
-//             document.getElementById("b1").mouseup(unclickButton);
-//             break;
-//     }
-// })
+function convertKey(key) {
+    switch (key) {
+        case "0" :
+        case "1" :
+        case "2" :
+        case "3" :
+        case "4" :
+        case "5" :
+        case "6" :
+        case "7" :
+        case "8" :
+        case "9" :
+        case "+" :
+        case "-" :
+        case "*" :
+        case "/" :
+        case "." :
+        case "=" :
+        case "%" :
+            return `b${key}`
+        case "Backspace" :
+            return "del";
+        case "q" :
+            return "allClear";
+        case "w" :
+            return "clearEntry";
+        case "a" :
+            return "addMem";
+        case "s" :
+            return "clearMem";
+        case "d" :
+            return "recallMem";
+        case "f" :
+            return "memPlus";
+        case "z" :
+            return "pi";
+        case "x" :
+            return "b%";
+        case "c" :
+            return "plusMinus";
+        case "Enter" :
+            return "b=";
+    }
+}
 
-// visual scripts
+// DISPLAY FUNCTIONS
 
+function setDisplaySymbols() {
+    setDisplayAns();
+    setDisplayMemory();
+    setDisplayOperators();
+}
 
+function setDisplayAns() {
+    if (isResult) {
+        displayAns.classList.remove("off");
+    } else {
+        displayAns.classList.add("off");
+    }
+}
 
-// // toggle display symbols
+function setDisplayMemory() {
+    if (memory) {
+        displayMem.classList.remove("off");
+    } else {
+        displayMem.classList.add("off");
+    }
+}
 
-// function toggleSymbol(displaySymbol) {
-//     if (array.length !== 3) {
-//         displayOperator.forEach(symbol => {
-//             symbol.classList.add('off');
-//         })
-//         displaySymbol.classList.remove('off');
-//     }
-// }
+function setDisplayOperators() {
+    if (array.length === 3) {
+        return;
+    } else {
+        displayOperators.forEach(displayOperator => displayOperator.classList.add("off"));
+    }
+    if (array.length === 2) {
+        switch (array[1]) {
+            case "+" :
+                displayPlus.classList.remove("off");
+                break;
+            case "-" :
+                displayMinus.classList.remove("off");
+                break;
+            case "*" :
+                displayMultiply.classList.remove("off");
+                break;
+            case "/" :
+                displayDivide.classList.remove("off")
+                break;
+        }
+    }
+}
 
+function showHelp() {
+    buttons.forEach(button => {
+        switch (button.textContent) {
+            case "C" :
+                button.textContent = "q";
+                break;
+            case "CE" :
+                button.textContent = "w";
+                break;
+            case "M" :
+                button.textContent = "a";
+                break;
+            case "MC" :
+                button.textContent = "s";
+                break;
+            case "MRC" :
+                button.textContent = "d";
+                break;
+            case "M+" :
+                button.textContent = "f";
+                break;
+            case "π" :
+                button.textContent = "z";
+                break;
+            case "%" :
+                button.textContent = "x";
+                break;
+            case "±" :
+                button.textContent = "c";
+                break;
+            case "÷" :
+                button.textContent = "/";
+                break;
+            case "×" :
+                button.textContent = "*";
+                break;
+            case "=" :
+                button.textContent = "= or ⏎"
+                break;
+        }
+    })
+}
 
+function hideHelp() {
+    buttons.forEach(button => {
+        switch (button.textContent) {
+            case "q" :
+                button.textContent = "C";
+                break;
+            case "w" :
+                button.textContent = "CE";
+                break;
+            case "a" :
+                button.textContent = "M";
+                break;
+            case "s" :
+                button.textContent = "MC";
+                break;
+            case "d" :
+                button.textContent = "MRC";
+                break;
+            case "f" :
+                button.textContent = "M+";
+                break;
+            case "z" :
+                button.textContent = "π";
+                break;
+            case "x" :
+                button.textContent = "%";
+                break;
+            case "c" :
+                button.textContent = "±";
+                break;
+            case "/" :
+                button.textContent = "÷";
+                break;
+            case "*" :
+                button.textContent = "×";
+                break;
+            case "= or ⏎" :
+                button.textContent = "=";
+                break;
+        }
+    })
+}
 
-
-// background text generator
+// BACKGROUND TEXT GENERATOR
 
 const generateNumber = () => Math.floor(Math.random() * 14) + 1;
 
