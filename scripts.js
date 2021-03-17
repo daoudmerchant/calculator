@@ -1,7 +1,3 @@
-// resize window
-
-window.open("", "", "width=500, height=580");
-
 // digits
 
 const digits = 8;
@@ -259,13 +255,13 @@ function pressButton(input) {
     if (input instanceof MouseEvent) {
         console.log(input.target.getAttribute("id"));
         calculate(input.target.getAttribute("id"));
-        input.target.classList.toggle('raised');
+        input.target.classList.remove('raised');
     } else if (input instanceof KeyboardEvent) {
         if (input.key === "Shift") { return };
         if (input.key === "k") { showHelp() };
         const keyValue = convertKey(input.key);
         calculate(keyValue);
-        document.getElementById(`${keyValue}`).classList.toggle('raised');
+        document.getElementById(`${keyValue}`).classList.remove('raised');
     }
     if (array.length === 1) {
         screenOperands.textContent = array[0];
@@ -276,14 +272,11 @@ function pressButton(input) {
 }
 
 function unpressButton(input) {
-    if (input instanceof MouseEvent) {
-        input.target.classList.toggle('raised');
-    } else if (input instanceof KeyboardEvent) {
+    if (input instanceof KeyboardEvent) {
         if (input.key === "Shift") { return };
         if (input.key === "k") { hideHelp() };
-        const keyValue = convertKey(input.key);
-        document.getElementById(`${keyValue}`).classList.toggle('raised');
     }
+    buttons.forEach(button => button.classList.add('raised'));
 }
 
 // EVENT LISTENERS
@@ -292,7 +285,7 @@ function unpressButton(input) {
 
 buttons.forEach(button => {
     button.addEventListener("mousedown", pressButton);
-    button.addEventListener("mouseup", unpressButton);
+    window.addEventListener("mouseup", unpressButton);
 })
 
 // keyboard events
