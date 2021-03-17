@@ -53,6 +53,12 @@ I am very aware of the following less-than-perfect solutions:
 - I'm aware that the 3D effect is 'fudged' with two linear box shadows, but it serves its purpose for me
 - Keyboard controls should really only be displayed for keyboard users, which is why I made them displayable on keypress, but ultimately it should be a separate box or something readable while operating the calculator
 - The calculator fits on small screens, but many more media query based options could be added for better formatting and added features
+- To fit my decision to make a fixed-digit display, I had to make some decisions about formatting:
+  - 100000000 (too long) = `'error'`
+  - 10000000.1 (inexpressible) = `'error'`
+  - 0.00000001 (inexpressible) = `'error'`
+  - 1000.00001 (inexpressible while distinguishing from integer) = `'error'`
+  - 1000.10001 = `1000.1` (even though this means 1000.1 + 0.00001 = 1000.1)
 
 All that said, it seems I have a solid calculator in its current form, and I intend to use it myself in future, which I would call a success. At no point was I really 'stumped', as everything seemed logical (although time-consuming) once the original 'array of strings' approach was decided upon. It's also relatively future-proofed, that is to say:
 

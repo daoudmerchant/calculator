@@ -67,10 +67,8 @@ function clear() {
 
 function formatResult(result) {
 
-    // Invalid values
-
-    if ((result > (10 ** digits - 1)) || // > 99999999
-        (result > (10 ** (digits - 1)) && !Number.isInteger(result)) ||
+    if ((result > (10 ** digits - 1)) || // > 100000000 = rerror
+        (result > (10 ** (digits - 1)) && !Number.isInteger(result)) || // 10000000.1 = error
         (result === Infinity)) {
         return "error";
     }
@@ -80,12 +78,12 @@ function formatResult(result) {
     // Expand negative E notation values (if required) or throw error
 
     if (result.includes("e-")) {
-        const eValueIndex = result.indexOf("-") + 1;
+        const eValueIndex = result.lastIndexOf("-") + 1;
         const eValue = result.slice(eValueIndex);
         if (eValue < digits) {
             result = Number(result).toFixed(digits - 1).toString();           
         } else {
-            return "error"; // too small to be displayed
+            return "error"; // 0.0000000[1] = error
         }
     }
 
@@ -96,6 +94,14 @@ function formatResult(result) {
         if (result.length > (digits + 1)) {
             result = Number(result).toPrecision(digits).toString();
         }
+        if (Number.isInteger(Number(result))) { // 1000.0000[1] = error
+            return "error";
+        }
+        for (let i = result.length; // 1000.1000[1] = 1000.1
+            result.charAt(result.length - 1) === "0";
+            i--) {
+            result = result.slice(0, result.length - 1);
+        }
         return result;
     } else { // integer values
         return `${result}.`;
@@ -105,7 +111,6 @@ function formatResult(result) {
 // ON KEYPRESS
 
 function calculate(key) {
-
     switch (key) {
         case "b0" :
         case "b1" :
@@ -215,7 +220,7 @@ function calculate(key) {
         case "del" :
             if (array === ["0."]) {
                 break;
-            } else if ((array[2] === "0.") || (isResult)) {
+            } else if ((array[2] === "0.") || (isResult) || (array[0] === "error")) {
                 clear();
             } else if (array.length !== 2) { // is number
                 if (array[array.length - 1].charAt(array[array.length - 1]
