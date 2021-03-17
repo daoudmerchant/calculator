@@ -1,3 +1,7 @@
+// resize window
+
+window.open("", "", "width=500, height=580");
+
 // digits
 
 const digits = 8;
@@ -92,19 +96,9 @@ function formatResult(result) {
     // Requires more code for positive E notation values if digits > 22
     // Already concerned I'm weirdly overkilling this calculator
 
-    // floating point values
-    if (result.includes(".")) {
+    if (result.includes(".")) { // floating point values
         if (result.length > (digits + 1)) {
-            const decimalPlace = digits - result.indexOf(".");
-            result = Number(result).toFixed(decimalPlace).toString();
-            if (result.includes("e")) {
-                return "error"
-            }; // necessary?
-            for (let i = result.length;
-                result.charAt(result.length - 1) === "0";
-                i--) {
-                result = result.slice(0, result.length - 1);
-            }
+            result = Number(result).toPrecision(digits).toString();
         }
         return result;
     } else { // integer values
