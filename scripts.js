@@ -67,7 +67,7 @@ function clear() {
 
 function formatResult(result) {
 
-    if ((result > (10 ** digits - 1)) || // > 100000000 = rerror
+    if ((result > (10 ** digits - 1)) || // > 100000000 = error
         (result > (10 ** (digits - 1)) && !Number.isInteger(result)) || // 10000000.1 = error
         (result === Infinity)) {
         return "error";
