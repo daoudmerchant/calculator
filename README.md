@@ -1,4 +1,6 @@
-# Brief
+# [Live Demo](https://daoudmerchant.github.io/calculator/)
+
+## Brief
 
 To construct a fully functioning in-browser calculator
 
@@ -8,13 +10,13 @@ Oh God... I can feel that I'm going to get stuck on this one at various points. 
 
 ## Thoughts after completion
 
-Well... That was both incredibly satisfying and incredibly exhausting! I feel like it took weeks, but actually it was only 5 days, it was just that I spent so long thinking about it between (long) sessions. As mentioned, I really wanted to push myself, not say no to anything for feeling it was beyond my ability, which I'm happy to say is largely the case. This definitely isn't definitive code, it was definitely about finding *a* solution rather than *the* solution or I'd spend 5 times as long reviewing and rewriting when I already feel I relatively overcooked the exercise by setting myself many additional parameters.
+Well... That was both incredibly satisfying and incredibly exhausting! I feel like it took weeks, but actually it was only 5 days, it was just that I spent so long thinking about it between (long) sessions. As mentioned, I really wanted to push myself, not say no to anything for feeling it was beyond my ability, which I'm happy to say is largely the case. This definitely isn't definitive code, it was definitely about finding _a_ solution rather than _the_ solution or I'd spend 5 times as long reviewing and rewriting when I already feel I relatively overcooked the exercise by setting myself many additional parameters.
 
 The main parameter was:
 
 **Don't be the Google calculator**
 
-I really wanted a calculator that people might *actually* choose to use, myself even since I'm not particularly satisfied by the calculator included in Ubuntu. I wanted an 'old-school' calculator, one like I had at school, with a simple 8-digit display and no E notation. This meant setting several sub-parameters:
+I really wanted a calculator that people might _actually_ choose to use, myself even since I'm not particularly satisfied by the calculator included in Ubuntu. I wanted an 'old-school' calculator, one like I had at school, with a simple 8-digit display and no E notation. This meant setting several sub-parameters:
 
 - Fixed 8 digit (with permanent decimal point)
 - Togglable display operator indicators
